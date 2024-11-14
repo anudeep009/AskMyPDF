@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { CircleUserRound } from "lucide-react";
 import LoginPopup from "../auth/LoginPopup";
+import { Link } from "react-router-dom";
 
 export function Navbar() {
   const [fileName, setFileName] = useState("No File Chosen");
@@ -20,7 +21,7 @@ export function Navbar() {
       formData.append("file", file);
 
       try {
-        const response = await axios.post("http://localhost:8000/upload_pdf/", formData, {
+        const response = await axios.post(`${import.meta.env.VITE_PRODUCTION_URL}/upload_pdf`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         console.log("Extracted Text:", response.data.text);
@@ -44,7 +45,7 @@ export function Navbar() {
     } else if (!user) {
       const fetchUser = async () => {
         try {
-          const response = await axios.get("http://localhost:3000/api/profile", {
+          const response = await axios.get(`${import.meta.env.VITE_PRODUCTION_URL}/api/profile`, {
             withCredentials: true,
           });
           setUser(response.data.user);
@@ -58,16 +59,16 @@ export function Navbar() {
   }, []);
 
   const openGoogleLogin = () => {
-    window.open("http://localhost:3000/auth/google", "_self");
+    window.open(`${import.meta.env.VITE_PRODUCTION_URL}/auth/google`, "_self");
   };
 
   return (
     <header className="bg-[#1f2433]">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
+        <Link to={"/"} className="flex items-center gap-2">
           <img src="/src/assets/image.png" alt="AI" width={32} height={32} className="h-10 w-10" />
           <h1 className='text-white font-bold font-mono hidden sm:block'>AskMyPDF</h1>
-        </div>
+        </Link>
         <div className="flex items-center gap-4">
           <div className="hidden items-center gap-2 text-sm text-gray-600 sm:flex">
             <div className="flex items-center gap-1">
@@ -111,7 +112,7 @@ export function Navbar() {
           </label>
           {user ? (
           <img
-            src={user.photos[0].value}
+            // src={user?.photos[0].value || "https://placehold.co/600x400"}
             className="h-10 w-10 rounded-full border-2"
             alt="Profile"
           />

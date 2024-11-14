@@ -1,13 +1,21 @@
 import './App.css'
-import { Navbar } from './components/NavBar.jsx'
+import { BrowserRouter,Route,Routes } from "react-router-dom"
+import Layout from '../Layout.jsx'
 import ChatInterface from './components/ChatInterface.jsx'
+import Profile from './components/Profile.jsx'
 
 function App() {
   
   return (
     <>
-      <Navbar />
-      <ChatInterface />
+      <BrowserRouter>
+      <Routes >
+        <Route path='/' element={<Layout />}>
+        <Route index element={<ChatInterface />} />
+        <Route path='/profile' element={<Profile />} />
+        </Route>
+      </Routes>
+      </BrowserRouter>
     </>
   )
 }
