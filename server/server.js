@@ -9,6 +9,16 @@ dotenv.config();
 const app = express();
 
 app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+
+//google authentication
+
+app.use(
   session({
     secret: "anudeepavula",
     resave: false,
@@ -16,12 +26,6 @@ app.use(
   })
 );
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -77,6 +81,8 @@ app.get("/logout", (req, res) => {
     res.redirect("http://localhost:5173");
   });
 });
+
+
 
 app.listen(3000, () => {
   console.log(`Server is running at port http://localhost:3000`);

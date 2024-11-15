@@ -112,7 +112,7 @@ export function Navbar() {
           </label>
           {user ? (
           <img
-            // src={user?.photos[0].value || "https://placehold.co/600x400"}
+            src={user?._json.picture || "https://placehold.co/600x400"}
             className="h-10 w-10 rounded-full border-2"
             alt="Profile"
           />
