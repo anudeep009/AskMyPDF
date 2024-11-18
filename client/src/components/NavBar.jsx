@@ -2,41 +2,47 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { CircleUserRound } from "lucide-react";
 import { Link } from "react-router-dom";
-import LoginPopup from "../auth/LoginPopup";
-
 
 export function Navbar() {
   const [fileName, setFileName] = useState("No File Chosen");
-  const [pdfText, setPdfText] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user")) || null
   );
+  const [loading, setLoading] = useState(false);
+  const [extractedText, setExtractedText] = useState("");
+  const [error, setError] = useState("")
 
-  const handleFileUpload = async (event) => {
+   const handleFileUpload = async (event) => {
     const uploadedFile = event.target.files[0];
     if (!uploadedFile) return;
-
+    if (uploadedFile.type !== "application/pdf") {
+      setError("Please upload a valid PDF file.");
+      return;
+    }
     setFileName(uploadedFile.name);
     setLoading(true);
-    setError(null);
+    setError("");
+
+    const formData = new FormData();
+    formData.append("pdf", uploadedFile);
 
     try {
-      const text = "";
-      setPdfText(text);
+      const response = await axios.post(
+        `${import.meta.env.VITE_PRODUCTION_URL}/api/pdf/extract-text`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      setExtractedText(response.data.text || "No text found in the PDF.");
     } catch (err) {
-      setError("Failed to extract text from the PDF.");
-      console.error(err);
+      console.error("Error extracting text:", err);
+      setError("Failed to extract text. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-
   useEffect(() => {
     const userParam = new URLSearchParams(window.location.search).get("user");
-
     if (userParam) {
       const userData = JSON.parse(decodeURIComponent(userParam));
       localStorage.setItem("user", JSON.stringify(userData));
@@ -83,7 +89,7 @@ export function Navbar() {
             </div>
           </div>
           <label className="flex items-center gap-2 rounded-md bg-[#5b63d3] px-3 ml-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#5b63d3] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer">
-            <span>Upload PDF</span>
+            <span>{loading ? "Uploading..." : "Upload PDF"}</span>
             <input
               type="file"
               accept="application/pdf"
@@ -104,12 +110,10 @@ export function Navbar() {
           )}
         </div>
       </div>
-      {loading && <p>Extracting text...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {pdfText && (
-        <div className="mt-4 text-white">
-          <h3>Extracted Text:</h3>
-          <p>{pdfText}</p>
+      {extractedText && (
+        <div className="mt-4 p-4 bg-gray-800 text-white rounded">
+          <h2 className="font-bold">Extracted Text:</h2>
+          <p>{extractedText}</p>
         </div>
       )}
     </header>

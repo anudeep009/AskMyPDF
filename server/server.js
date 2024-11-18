@@ -4,6 +4,7 @@ import passport from "passport";
 import session from "express-session";
 import GoogleStrategy from "passport-google-oauth20";
 import cors from "cors";
+import pdfRoutes from "./routes/pdf.routes.js";
 
 dotenv.config();
 const app = express();
@@ -15,8 +16,7 @@ app.use(
   })
 );
 
-
-//google authentication
+//google auth
 
 app.use(
   session({
@@ -25,7 +25,6 @@ app.use(
     saveUninitialized: true,
   })
 );
-
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -59,7 +58,7 @@ app.get(
       displayName: req.user.displayName,
       email: req.user.emails[0].value,
     };
-    
+
     res.redirect(
       `http://localhost:5173/profile?user=${encodeURIComponent(
         JSON.stringify(user)
@@ -82,10 +81,13 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/",(req,res) => {
-  res.send("server running...")
-})
+app.get("/", (req, res) => {
+  res.send("server running...");
+});
 
+//routes
+
+app.use("/api", pdfRoutes);
 
 app.listen(3000, () => {
   console.log(`Server is running at port http://localhost:3000`);
